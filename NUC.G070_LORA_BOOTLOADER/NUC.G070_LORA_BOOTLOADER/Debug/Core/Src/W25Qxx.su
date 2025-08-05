@@ -1,0 +1,16 @@
+../Core/Src/W25Qxx.c:14:9:W25qxx_Spi	40	static
+../Core/Src/W25Qxx.c:20:6:W25qxx_WaitForWriteEnd	16	static
+../Core/Src/W25Qxx.c:35:6:W25Q_Reset	16	static
+../Core/Src/W25Qxx.c:46:10:W25Q_ReadID	16	static
+../Core/Src/W25Qxx.c:58:10:W25Q_Read_Manufacturer_ID	24	static
+../Core/Src/W25Qxx.c:73:10:W25Q_Read_UID	152	static
+../Core/Src/W25Qxx.c:87:6:W25Q_Write_Enable	8	static
+../Core/Src/W25Qxx.c:94:6:W25Q_Write_Disable	8	static
+../Core/Src/W25Qxx.c:100:6:W25Q_Page_Program	304	static
+../Core/Src/W25Qxx.c:131:6:W25Q_Buf_Program	304	static
+../Core/Src/W25Qxx.c:162:6:W25Q_Write_DoubleWord	192	static
+../Core/Src/W25Qxx.c:191:9:W25Q_Read_Word	40	static
+../Core/Src/W25Qxx.c:207:9:W25Q_Read_DoubleWord	160	static
+../Core/Src/W25Qxx.c:227:9:W25Q_Read_Page	32	static
+../Core/Src/W25Qxx.c:245:9:W25Q_Read_Fast	32	static
+../Core/Src/W25Qxx.c:266:6:W25Q_Chip_Erase	16	static
