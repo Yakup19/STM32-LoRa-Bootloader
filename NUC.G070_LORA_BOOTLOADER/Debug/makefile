@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (10.3-2021.10)
+# Toolchain: GNU Tools for STM32 (13.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -63,8 +63,8 @@ all: main-build
 main-build: NUC.G070_LORA_BOOTLOADER.elf secondary-outputs
 
 # Tool invocations
-NUC.G070_LORA_BOOTLOADER.elf NUC.G070_LORA_BOOTLOADER.map: $(OBJS) $(USER_OBJS) C:\Users\yakup\OneDrive\Belgeler\STM32CubeIDE\STM32_Cube_IDE_1.12.1\NUC.G070_LORA_BOOTLOADER\STM32G070RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "NUC.G070_LORA_BOOTLOADER.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\yakup\OneDrive\Belgeler\STM32CubeIDE\STM32_Cube_IDE_1.12.1\NUC.G070_LORA_BOOTLOADER\STM32G070RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="NUC.G070_LORA_BOOTLOADER.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+NUC.G070_LORA_BOOTLOADER.elf NUC.G070_LORA_BOOTLOADER.map: $(OBJS) $(USER_OBJS) C:\Users\yakup\OneDrive\Belgeler\STM32CubeIDE\Workspace_User\NUC.G070_LORA_BOOTLOADER\STM32G070RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "NUC.G070_LORA_BOOTLOADER.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\yakup\OneDrive\Belgeler\STM32CubeIDE\Workspace_User\NUC.G070_LORA_BOOTLOADER\STM32G070RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="NUC.G070_LORA_BOOTLOADER.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

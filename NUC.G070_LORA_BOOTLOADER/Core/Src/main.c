@@ -61,8 +61,7 @@ DMA_HandleTypeDef hdma_usart3_rx;
 uint8_t bootloader_rx_data[BL_RX_DATA_LENGTH];
 uint8_t Bootloader_Main_Buf[2000]={'\0'};
 uint8_t Boot_Receive_Flag=0;
-uint8_t Deneme_Buf[4]={0x12,0x34,0x56,0x78};
-uint32_t *Deneme;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,6 +74,9 @@ static void MX_I2C1_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
+void restart_RxDMA(void);
+void printMessage(char *format, ...);
+void bootloader_jump_to_user_application(void);
 
 /* USER CODE END PFP */
 
@@ -90,54 +92,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 
 	}
 }
-
-void printMessage(char *format, ...) {
-	char comingMessage[100] = { 0 };
-	va_list vaList;
-	va_start(vaList, format);
-	vsprintf(comingMessage, format, vaList);
-	SSD1306_GotoXY(0, 0);
-	SSD1306_Puts(comingMessage, &Font_7x10, 1);
-	SSD1306_UpdateScreen(); //display
-	va_end(vaList);
-}
-
-void bootloader_jump_to_user_application(void) {
-	//  Kesmeleri kapa
-	/*__disable_irq();// __disable_irq deyince hal_delay çalışmıyor unutma !!!!!*/
-
-	printMessage("bootloader_jump_to_user_application() \n");
-
-	//  MSP'nin değerini tut
-	uint32_t mspValue = *(volatile uint32_t*) FLASH_APP_BASE_ADDRESS;
-	printMessage("MSP Value: %#x \n", mspValue);
-
-	// Sıfırlama işleyicisinin değerini tut
-	uint32_t resetValue = *(volatile uint32_t*) (FLASH_APP_BASE_ADDRESS + 4);
-	printMessage("Reset Value: %#x \n", resetValue);
-
-	//  Periferleri sıfırla ve devre dışı bırak
-
-	SCB->VTOR = FLASH_APP_BASE_ADDRESS;
-	//__set_MSP(mspValue);	// Bu fonksiyon F407 De calisiyordu ama
-	//L053 de çalışmıyor
-	SysTick->CTRL = 0;
-	SysTick->LOAD = 0;
-	SysTick->VAL = 0;
-	HAL_I2C_DeInit(&hi2c1);
-	HAL_UART_MspDeInit(&huart3);
-	HAL_GPIO_DeInit(GPIOC, GPIO_PIN_13);
-	HAL_UART_MspDeInit(&huart2);
-	HAL_DMA_DeInit(&hdma_usart3_rx);
-	HAL_CRC_DeInit(&hcrc);
-	HAL_RCC_DeInit();
-
-	HAL_DeInit();
-	resetValue = *((volatile uint32_t*) (FLASH_APP_BASE_ADDRESS + 4));
-	void (*jump_to_app)(void) = (void *)resetValue;
-	jump_to_app();
-
-}
 /* USER CODE END 0 */
 
 /**
@@ -146,6 +100,7 @@ void bootloader_jump_to_user_application(void) {
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -176,8 +131,7 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   SSD1306_Init();
-  HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-  __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+  restart_RxDMA();
   //W25Q_Chip_Erase();
   /* USER CODE END 2 */
 
@@ -185,84 +139,69 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		SSD1306_GotoXY(0, 32);
-		SSD1306_Puts("BOOTLAODER", &Font_7x10, 1);
-		SSD1306_UpdateScreen(); //display
-
+		printMessage("Bootloader");
 	  if(Boot_Receive_Flag==1){
 		switch (bootloader_rx_data[1]) {
 		case BL_GET_VER:/*TAMAMEN CALISIYOR*/
 			bootloader_get_ver_cmd(bootloader_rx_data);
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 		case BL_GET_HELP:/*TAMAMEN CALISIYOR*/
 			bootloader_get_help_cmd(bootloader_rx_data);
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 		case BL_GET_CID:/*TAMAMEN CALISIYOR */
 			bootloader_get_cid_cmd(bootloader_rx_data); //calıisiyor
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 		case BL_GET_RDP_STATUS:/*TAMAMEN CALISIYOR*/
 			bootloader_get_rdp_cmd(bootloader_rx_data);// calısiyor
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 		case BL_GO_TO_ADDR:/*TAMAMEN CALISIYOR*/
 			bootloader_go_to_addr_cmd(bootloader_rx_data);// calısiyor
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 			/*	Once page sonra ondan sonraki kaç tane page silincek ise o girilecek  */
 		case BL_FLASH_ERASE:/*TAMAMEN CALISIYOR*/
 			bootloader_flash_erase_cmd(bootloader_rx_data);
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 			/*	Yazma yapılmadan önce kullanılacak pageler flash erase yapılmalı*/
 		case BL_MEM_WRITE:/*TAMAMEN CALISIYOR*/
 			bootloader_mem_write_cmd(bootloader_rx_data);
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 		case BL_EN_RW_PROTECT:
 			bootloader_enable_read_write_protect_cmd(bootloader_rx_data);
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 		case BL_DIS_R_W_PROTECT:
 			bootloader_disable_read_write_protect_cmd(bootloader_rx_data);
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 		case BL_GO_TO_BOOTLOADER:
 			bootloader_go_to_bootloader_cmd(bootloader_rx_data);
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 		case BL_EXT_MEM_WRITE:
 			bootloader_ext_mem_write_cmd(bootloader_rx_data);
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 		case BL_EXT_MEM_TO_MEM_WRITE:
 			bootloader_ext_mem_to_mem_write_cmd(bootloader_rx_data);
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
-			__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+			restart_RxDMA();
 			Boot_Receive_Flag=0;
 			break;
 			default:
@@ -282,9 +221,7 @@ int main(void)
 
 		  		bootloader_jump_to_user_application();
 		  	}
-		SSD1306_GotoXY(0, 32);
-		SSD1306_Puts("WORKING", &Font_7x10, 1);
-		SSD1306_UpdateScreen(); //display
+		printMessage("Working");
 
 
     /* USER CODE END WHILE */
@@ -386,7 +323,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00602173;
+  hi2c1.Init.Timing = 0x00C12166;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -566,8 +503,8 @@ static void MX_DMA_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -592,11 +529,66 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
+
+void restart_RxDMA(void)
+{
+	HAL_UARTEx_ReceiveToIdle_DMA(&huart3, bootloader_rx_data, BL_RX_DATA_LENGTH);
+	__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+}
+void printMessage(char *format, ...) {
+	char comingMessage[100] = { 0 };
+	va_list vaList;
+	va_start(vaList, format);
+	vsprintf(comingMessage, format, vaList);
+	SSD1306_GotoXY(0, 0);
+	SSD1306_Puts(comingMessage, &Font_7x10, 1);
+	SSD1306_UpdateScreen(); //display
+	va_end(vaList);
+}
+
+void bootloader_jump_to_user_application(void) {
+	//  Kesmeleri kapa
+	/*__disable_irq();// __disable_irq deyince hal_delay çalışmıyor unutma !!!!!*/
+
+	printMessage("bootloader_jump_to_user_application() \n");
+
+	//  MSP'nin değerini tut
+	uint32_t mspValue = *(volatile uint32_t*) FLASH_APP_BASE_ADDRESS;
+	printMessage("MSP Value: %#x \n", mspValue);
+
+	// Sıfırlama işleyicisinin değerini tut
+	uint32_t resetValue = *(volatile uint32_t*) (FLASH_APP_BASE_ADDRESS + 4);
+	printMessage("Reset Value: %#x \n", resetValue);
+
+	//  Periferleri sıfırla ve devre dışı bırak
+
+	SCB->VTOR = FLASH_APP_BASE_ADDRESS;
+	//__set_MSP(mspValue);	// Bu fonksiyon F407 De calisiyordu ama
+	//L053 de çalışmıyor
+	SysTick->CTRL = 0;
+	SysTick->LOAD = 0;
+	SysTick->VAL = 0;
+	HAL_I2C_DeInit(&hi2c1);
+	HAL_UART_MspDeInit(&huart3);
+	HAL_GPIO_DeInit(GPIOC, GPIO_PIN_13);
+	HAL_UART_MspDeInit(&huart2);
+	HAL_DMA_DeInit(&hdma_usart3_rx);
+	HAL_CRC_DeInit(&hcrc);
+	HAL_RCC_DeInit();
+
+	HAL_DeInit();
+	resetValue = *((volatile uint32_t*) (FLASH_APP_BASE_ADDRESS + 4));
+	void (*jump_to_app)(void) = (void *)resetValue;
+	jump_to_app();
+
+}
+
+
 
 /* USER CODE END 4 */
 
@@ -614,8 +606,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.

@@ -53,7 +53,8 @@ void bootloader_ext_mem_to_mem_write_cmd(uint8_t* bl_rx_data);
 
 /**************************	CRC Verify Function	******************************/
 uint8_t bootloader_verify_crc(uint8_t *Buffer, uint32_t len, uint32_t crcHost);
-
+uint32_t assemble_crc_from_packet(const uint8_t *packet, uint32_t packet_len);
+uint32_t assemble_crc_from_fixed_position(const uint8_t *packet);
 void bootloader_send_ack(uint8_t followLength);
 void bootloader_send_nack();
 
