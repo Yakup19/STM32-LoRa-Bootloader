@@ -8,9 +8,8 @@
 #ifndef INC_W25QXX_H_
 #define INC_W25QXX_H_
 
+#include "main.h"
 
-
-#endif /* INC_W25QXX_H_ */
 
 
 extern SPI_HandleTypeDef 	hspi1;
@@ -123,3 +122,4 @@ uint8_t W25Q_Read_Fast(uint32_t Adress, uint8_t *Buffer);
 
 
 
+#endif /*INC_W25QXX_H_*/

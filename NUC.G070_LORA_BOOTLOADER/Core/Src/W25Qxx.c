@@ -4,7 +4,6 @@
  *  Created on: Aug 7, 2023
  *      Author: yakup
  */
-#include "main.h"
 #include "W25Qxx.h"
 
 

@@ -21,7 +21,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "bootloader_command_code.h"
 #include "bootloader_command_app.h"
 #include "stdarg.h"
 #include "stdio.h"

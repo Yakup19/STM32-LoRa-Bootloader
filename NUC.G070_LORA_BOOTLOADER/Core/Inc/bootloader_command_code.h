@@ -10,6 +10,10 @@
 
 #include "main.h"
 
+
+
+#define SUPPORTED_COMMANDS_COUNT			0x0F
+
 #define BL_GET_VER							0x51
 #define BL_GET_HELP							0x52
 #define BL_GET_CID							0x53
@@ -27,23 +31,8 @@
 #define BL_EXT_MEM_TO_MEM_WRITE				0x5F
 
 
+extern uint8_t supported_commands[SUPPORTED_COMMANDS_COUNT];
 
-uint8_t supported_commands[] =
-{
-
-	BL_GET_VER,
-	BL_GET_HELP,
-	BL_GET_CID,
-	BL_GET_RDP_STATUS,
-	BL_GO_TO_ADDR,
-	BL_FLASH_ERASE,
-	BL_MEM_WRITE,
-	BL_EN_RW_PROTECT,
-	BL_MEM_READ,
-	BL_READ_SECTOR_P_STATUS,
-	BL_OTP_READ,
-	BL_DIS_R_W_PROTECT
-};
 
 
 #endif /* INC_BOOTLOADER_COMMAND_CODE_H_ */

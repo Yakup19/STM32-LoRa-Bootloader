@@ -34,9 +34,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_spi_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
- ../Core/Inc/bootloader_command_code.h ../Core/Inc/main.h \
- ../Core/Inc/bootloader_command_app.h ../Core/Inc/ssd1306.h \
- ../Core/Inc/fonts.h ../Core/Inc/fonts.h ../Core/Inc/W25Qxx.h
+ ../Core/Inc/bootloader_command_app.h ../Core/Inc/main.h \
+ ../Core/Inc/bootloader_command_code.h ../Core/Inc/ssd1306.h \
+ ../Core/Inc/fonts.h ../Core/Inc/W25Qxx.h ../Core/Inc/ssd1306.h \
+ ../Core/Inc/fonts.h ../Core/Inc/W25Qxx.h
 ../Core/Inc/main.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
 ../Core/Inc/stm32g0xx_hal_conf.h:
@@ -73,10 +74,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_spi_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
-../Core/Inc/bootloader_command_code.h:
-../Core/Inc/main.h:
 ../Core/Inc/bootloader_command_app.h:
+../Core/Inc/main.h:
+../Core/Inc/bootloader_command_code.h:
 ../Core/Inc/ssd1306.h:
 ../Core/Inc/fonts.h:
+../Core/Inc/W25Qxx.h:
+../Core/Inc/ssd1306.h:
 ../Core/Inc/fonts.h:
 ../Core/Inc/W25Qxx.h:

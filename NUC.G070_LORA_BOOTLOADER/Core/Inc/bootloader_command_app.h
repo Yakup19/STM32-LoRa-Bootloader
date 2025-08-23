@@ -8,9 +8,16 @@
 #ifndef INC_BOOTLOADER_COMMAND_APP_H_
 #define INC_BOOTLOADER_COMMAND_APP_H_
 
+
 #include "main.h"
+#include "bootloader_command_code.h"
+
+#include "ssd1306.h"
+#include "W25Qxx.h"
 #include "stdio.h"
 #include "string.h"
+#include "fonts.h"
+
 
 #define BL_VER	0X10		//	1.0
 
@@ -55,7 +62,7 @@ void bootloader_ext_mem_to_mem_write_cmd(uint8_t* bl_rx_data);
 uint8_t bootloader_verify_crc(uint8_t *Buffer, uint32_t len, uint32_t crcHost);
 uint32_t assemble_crc_from_packet(const uint8_t *packet, uint32_t packet_len);
 uint32_t assemble_crc_from_fixed_position(const uint8_t *packet);
-void bootloader_send_ack(uint8_t followLength);
+void send_ack_response(uint8_t payload_length, const uint8_t *payload, uint32_t payload_size);
 void bootloader_send_nack();
 
 uint8_t bootloader_get_version(void);
